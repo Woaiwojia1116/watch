@@ -1,0 +1,62 @@
+# ============================================================
+# .gitignore for STM32 CubeMX + Keil MDK-ARM + FreeRTOS project
+# ============================================================
+# 保留 .uvprojx / .uvoptx / .h 十六进制 / .bin 烧录文件
+# 忽略所有编译中间文件、特定用户的 IDE配置、以及 CubeMX 自动生成的本地设置
+# ============================================================
+
+# ---------- Keil MDK-ARM 编译中间文件 ----------
+*.o
+*.d
+*.crf
+*.iex
+*.lst
+*.htm
+*.map
+*.lnp
+*.dep
+
+# ---------- CubeMX / 编译器输出目录 ----------
+MDK-ARM/freertos/*.o
+MDK-ARM/freertos/*.d
+MDK-ARM/freertos/*.crf
+MDK-ARM/freertos/*.htm
+MDK-ARM/freertos/*.map
+MDK-ARM/freertos/*.lnp
+MDK-ARM/freertos/*.sct
+MDK-ARM/freertos/*.dep
+MDK-ARM/freertos/*.iex
+
+# ---------- Keil ELF 调试输出 ----------
+*.axf
+*.elf
+
+# ---------- Keil 用户特定配置（不提交）----------
+**/DebugConfig/
+**/RTE/
+**/.vscode/
+*.uvguix.*
+*.uvoptx
+EventRecorderStub.scvd
+
+# ---------- Keil / CS+ 编译器日志 ----------
+*.uv4.log
+*.uv4.log.lock
+keil-assistant*.log
+
+# ---------- 编译产物目录（如有独立 output 文件夹）----------
+build/
+Debug/
+Release/
+Objects/
+Listings/
+
+# ---------- Hex / Bin（根据团队需要选择是否忽略）----------
+# 如果团队选择保留烧录文件，请注释掉下面两行
+# *.hex
+# *.bin
+
+# ---------- 系统 / 编辑器临时文件 ----------
+Thumbs.db
+Desktop.ini
+*~
