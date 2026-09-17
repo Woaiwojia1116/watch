@@ -78,6 +78,7 @@ void refresh_timer_callback(TimerHandle_t xTimer) {
     }
 
 }
+
 void KeyScan_Task(void *arg)
 {
   KeyEvent_t k[2];
@@ -91,12 +92,13 @@ void KeyScan_Task(void *arg)
             xQueueSend(key_event_queue,&k[i],0);
         }
     }
-    vTaskDelay(10);
+    vTaskDelay(6);
   }
 }
 
 void Display_Task(void *arg)
 {
+
   DisplayMsg_t  refresh_flag = DISPLAY_NONE;
   while (1)
   {
@@ -151,7 +153,16 @@ void Menu_Task(void *arg)
                 case KEY_EVENT_LONG_PRESS:
                   if(k.key == 0)
                   {
-                    move_np_up();
+                    if(current_node->prev != NULL)
+                    {
+                        move_np_up();
+                        refresh();
+                    }
+                    else if(current_node->prev == NULL && current_node != head_node)
+                    {
+                        move_fc_up();
+                        refresh();
+                    }
                     refresh();
                   }
                     

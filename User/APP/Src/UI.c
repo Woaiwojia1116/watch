@@ -1,4 +1,5 @@
 #include "main.h"
+#include "action.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -82,10 +83,43 @@ void UI_back(void)
 void UI_setting(void)
 {
     OLED_Clear();
-    OLED_ShowString(0, 32, "Setting", OLED_6X8);
+
+    // 标题
+    OLED_ShowString(0, 0, "SETTING", OLED_6X8);
+
+    // 底部按键提示
+    OLED_ShowString(0, 56, "[ENTER]", OLED_6X8);
 }
+
 void UI_light(void)
 {
     OLED_Clear();
-    OLED_ShowString(0, 32, "Light    ", OLED_6X8);
+    OLED_ShowString(64,32, "LIGHT", OLED_6X8);
+}
+void UI_light_signal(void)
+{
+    OLED_Clear();
+
+    // 标题
+    OLED_ShowString(0, 0, "LIGHT", OLED_6X8);
+    OLED_DrawLine(0, 10, 127, 10);
+
+    // 进度条外框
+    OLED_DrawRectangle(10, 24, 108, 12, OLED_UNFILLED);
+
+    // 进度条填充（根据当前占空比）
+    uint8_t duty = light_get_duty();
+    uint8_t fill_w = (uint16_t)duty * 104 / 100;
+    if (fill_w > 0)
+    {
+        OLED_DrawRectangle(12, 26, fill_w, 8, OLED_FILLED);
+    }
+
+    // 百分比显示（使用 OLED_ShowNum 避免 vsprintf 可能的阻塞问题）
+    OLED_ShowNum(45, 42, duty, 3, OLED_6X8);
+    OLED_ShowString(63, 42, "%", OLED_6X8);
+
+    // 底部按键提示
+    OLED_ShowString(0, 56, "[ADJ]", OLED_6X8);
+    OLED_ShowString(90, 56, "[BACK]", OLED_6X8);
 }

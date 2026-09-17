@@ -37,6 +37,7 @@ extern "C" {
 #include "node.h"
 #include "UI.h"
 #include "action.h"
+#include "tim.h"
 #include "timers.h"
 /* USER CODE END Includes */
 

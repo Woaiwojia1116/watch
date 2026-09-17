@@ -1,5 +1,6 @@
 #include "main.h"
 #include "node.h"
+#include "action.h"
 #include <stdlib.h>
 
 Node *head_node = NULL;
@@ -120,9 +121,12 @@ void creat_menu(void)
 
     Node * setting_back_node = add_child(setting_node, UI_back, move_fc_up, move_np_down);
 
-    Node * light_node = add_silbing(setting_back_node, UI_light, NULL, move_np_down);
+    Node * light_node = add_silbing(setting_back_node, UI_light, move_fc_down, move_np_down);
+
+     Node * light_signal_node = add_child(light_node, UI_light_signal, light_adjust, move_np_down);
 
     head_node = root_node;
+
     current_node = head_node;
 }
 

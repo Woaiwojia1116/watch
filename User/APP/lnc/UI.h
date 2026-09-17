@@ -5,6 +5,7 @@ void UI_main(void);
 void UI_back(void);
 void UI_setting(void);
 void UI_light(void);
+void UI_light_signal(void);
   typedef enum {
      DISPLAY_NONE = 0,
       DISPLAY_MSG_REDRAW = 1,   // 重绘当前页面（导航、按键触发）
