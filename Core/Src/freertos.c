@@ -26,11 +26,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "queue.h"
-#define tiaoshi 0
-
-#if tiaoshi
+#include "node.h"
+#include "slide.h"
+#include "slide_render.h"
 #include "oled.h"
-#endif
+#define tiaoshi 0
 
 /* USER CODE END Includes */
 
@@ -71,12 +71,12 @@ static void refresh(void) {
     xQueueOverwrite(display_queue, &msg);
 }
 void refresh_timer_callback(TimerHandle_t xTimer) {
-    if(current_node == head_node)
+    (void)xTimer;
+    /* 仅在根节点且无滑动动画时自动刷新（用于main界面动画） */
+    if(current_node == head_node && !slide_is_active())
     {
-        (void)xTimer;
         refresh();
     }
-
 }
 
 void KeyScan_Task(void *arg)
@@ -98,7 +98,6 @@ void KeyScan_Task(void *arg)
 
 void Display_Task(void *arg)
 {
-
   DisplayMsg_t  refresh_flag = DISPLAY_NONE;
   while (1)
   {
@@ -107,17 +106,46 @@ void Display_Task(void *arg)
       if(refresh_flag == DISPLAY_MSG_REDRAW)
       {
         refresh_flag = DISPLAY_NONE;
+        if(current_node == head_node) {
+          /* 根节点：独立显示（保持原有动画效果） */
           if(current_node != NULL && current_node->display != NULL)
           {
-            current_node->display();			
+            current_node->display();
           }
           else{
             OLED_Clear();
             OLED_ShowString(0,0,"ERROR",OLED_8X16);
           }
           OLED_Update();
+        } else {
+          /* 非根节点：使用统一渲染器 */
+          if(current_node != NULL && current_node->name != NULL)
+          {
+            slide_draw_page(current_node);
+          }
+          else if(current_node != NULL && current_node->display != NULL)
+          {
+            current_node->display();
+          }
+          OLED_Update();
+        }
       }
-
+      else if(refresh_flag == DISPLAY_MSG_SLIDE_LEFT || refresh_flag == DISPLAY_MSG_SLIDE_RIGHT)
+      {
+        /* 滑动动画 */
+        uint8_t dir = (refresh_flag == DISPLAY_MSG_SLIDE_RIGHT) ? SLIDE_DIR_RIGHT : SLIDE_DIR_LEFT;
+        refresh_flag = DISPLAY_NONE;
+        slide_start(current_node, dir);
+        /* 执行动画帧 */
+        while(!slide_step())
+        {
+          OLED_Update();
+          vTaskDelay(pdMS_TO_TICKS(SLIDE_FRAME_MS));
+        }
+        /* 最后一帧 */
+        OLED_Update();
+        slide_input_locked = 0;
+      }
     }
   }
 }
@@ -130,19 +158,32 @@ void Menu_Task(void *arg)
       KeyEvent_t k;
         if(xQueueReceive(key_event_queue, &k, portMAX_DELAY) == pdTRUE)
         {
+            /* 滑动动画期间忽略按键 */
+            if(slide_input_locked) continue;
+
             switch(k.event)
             {
                 case KEY_EVENT_SHORT_PRESS:
                 if(k.key == 0)
                 {
-                    if(current_node->move != NULL)
-                    {
-                        current_node->move();
-                        refresh();
-                    }
+                    /* Key0短按：前进 */
+                    if(current_node == head_node) {
+                        /* 根节点：进入子节点（即时切换） */
+                        if(current_node->child != NULL)
+                        {
+                            current_node = current_node->child;
+                            refresh();
+                        }
+                    } else if(current_node->next != NULL) {
+                        /* 有下一兄弟：向左滑动切换 */
+                        current_node = current_node->next;
+                        DisplayMsg_t msg = DISPLAY_MSG_SLIDE_LEFT;
+                        xQueueOverwrite(display_queue, &msg);
+                    } 
                 }
                 else if(k.key == 1)
                 {
+                    /* Key1短按：执行当前节点的功能 */
                     if(current_node->action != NULL)
                     {
                         current_node->action();
@@ -153,23 +194,23 @@ void Menu_Task(void *arg)
                 case KEY_EVENT_LONG_PRESS:
                   if(k.key == 0)
                   {
-                    if(current_node->prev != NULL)
-                    {
-                        move_np_up();
+                    /* Key0长按：返回 */
+                    if(current_node == head_node) {
+                        /* 根节点：忽略 */
+                    } else if(current_node->prev != NULL) {
+                        /* 有上一兄弟：向右滑动切换 */
+                        current_node = current_node->prev;
+                        DisplayMsg_t msg = DISPLAY_MSG_SLIDE_RIGHT;
+                        xQueueOverwrite(display_queue, &msg);
+                    }else if(current_node->father != NULL) {
+                        /* 没有上一兄弟：返回父节点（即时切换） */
+                        current_node = current_node->father;
                         refresh();
                     }
-                    else if(current_node->prev == NULL && current_node != head_node)
-                    {
-                        move_fc_up();
-                        refresh();
-                    }
-                    refresh();
                   }
-                    
                 break;
             }
         }
-
   }
 }
 

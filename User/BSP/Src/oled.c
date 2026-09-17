@@ -467,6 +467,36 @@ void OLED_UpdateArea(int16_t X, int16_t Y, uint8_t Width, uint8_t Height)
 }
 
 /**
+  * 函    数：将指定缓冲区全屏刷到OLED（用于滑动动画）
+  */
+void OLED_FlushBuffer(const uint8_t buf[8][128])
+{
+    uint8_t j;
+    for (j = 0; j < 8; j ++)
+    {
+        OLED_SetCursor(j, 0);
+        OLED_WriteData((uint8_t *)buf[j], 128);
+    }
+}
+
+/**
+  * 函    数：将指定缓冲区的指定列范围刷到OLED
+  */
+void OLED_FlushColumns(const uint8_t buf[8][128], uint8_t start_col, uint8_t end_col)
+{
+    uint8_t j;
+    if (start_col > 127) start_col = 0;
+    if (end_col > 128) end_col = 128;
+    if (start_col >= end_col) return;
+
+    for (j = 0; j < 8; j ++)
+    {
+        OLED_SetCursor(j, start_col);
+        OLED_WriteData((uint8_t *)&buf[j][start_col], end_col - start_col);
+    }
+}
+
+/**
   * 函    数：将OLED显存数组全部清零
   * 参    数：无
   * 返 回 值：无

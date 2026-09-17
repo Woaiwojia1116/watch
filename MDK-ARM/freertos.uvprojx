@@ -668,6 +668,26 @@
               <FilePath>..\User\APP\lnc\action.h</FilePath>
             </File>
             <File>
+              <FileName>slide.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Src\slide.c</FilePath>
+            </File>
+            <File>
+              <FileName>slide.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\APP\lnc\slide.h</FilePath>
+            </File>
+            <File>
+              <FileName>slide_render.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\APP\Src\slide_render.c</FilePath>
+            </File>
+            <File>
+              <FileName>slide_render.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\APP\lnc\slide_render.h</FilePath>
+            </File>
+            <File>
               <FileName>init.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\APP\Src\init.c</FilePath>

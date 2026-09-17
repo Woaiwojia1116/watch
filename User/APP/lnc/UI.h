@@ -8,8 +8,9 @@ void UI_light(void);
 void UI_light_signal(void);
   typedef enum {
      DISPLAY_NONE = 0,
-      DISPLAY_MSG_REDRAW = 1,   // 重绘当前页面（导航、按键触发）
-      // 未来扩展：DISPLAY_MSG_TOAST, DISPLAY_MSG_PAGE_JUMP 等
+      DISPLAY_MSG_REDRAW = 1,   /* 重绘当前页面（导航、按键触发） */
+      DISPLAY_MSG_SLIDE_LEFT = 2,  /* 向左滑动（切换到下一兄弟节点） */
+      DISPLAY_MSG_SLIDE_RIGHT = 3  /* 向右滑动（切换到上一兄弟节点） */
   } DisplayMsg_t;
   
 #endif

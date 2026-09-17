@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include "OLED_Data.h"
 
+/* 显存数组声明（定义在oled.c中） */
+extern uint8_t OLED_DisplayBuf[8][128];
+
 /*参数宏定义*********************/
 
 /*FontSize参数取值*/
@@ -38,6 +41,11 @@ void OLED_Init(void);
 /*更新函数*/
 void OLED_Update(void);
 void OLED_UpdateArea(int16_t X, int16_t Y, uint8_t Width, uint8_t Height);
+
+/* 辅助函数：将指定缓冲区全屏刷到OLED（用于滑动动画） */
+void OLED_FlushBuffer(const uint8_t buf[8][128]);
+/* 辅助函数：将指定缓冲区的指定列范围刷到OLED */
+void OLED_FlushColumns(const uint8_t buf[8][128], uint8_t start_col, uint8_t end_col);
 
 /*显存控制函数*/
 void OLED_Clear(void);
